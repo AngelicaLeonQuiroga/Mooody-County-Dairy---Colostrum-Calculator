@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mooody County Dairy - Colostrum Calculator</title>
+	<link rel="manifest" href="manifest.json">
+
+    <meta name="theme-color" content="#2c3e50">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 500px;
+            padding: 2rem;
+            margin: auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 1.5rem;
+        }
+
+        .farm-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.4rem;
+            letter-spacing: 1px;
+        }
+
+        .title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .language-toggle {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .lang-btn {
+            padding: 8px 20px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .lang-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .input-group { margin-bottom: 1.2rem; }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .hint { font-size: 11px; color: #999; margin-top: 4px; }
+
+        .results-section {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 3px solid #f0f0f0;
+        }
+
+        .main-result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.2rem;
+        }
+
+        .result-label {
+            font-size: 13px;
+            font-weight: 700;
+            opacity: 0.9;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+
+        .breakdown-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(255,255,255,0.18);
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-bottom: 8px;
+        }
+
+        .breakdown-num {
+            font-size: 60px;
+            font-weight: 800;
+            line-height: 1;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .big-label {
+            font-size: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        .small-label {
+            font-size: 11px;
+            opacity: 0.8;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .breakdown-plus {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 700;
+            opacity: 0.6;
+            margin-bottom: 8px;
+        }
+
+        .subtext {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
+        .cup-guide {
+            background: rgba(255,255,255,0.12);
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-top: 12px;
+        }
+
+        .cup-guide-title {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .cup-ref-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .cup-ref-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            padding: 8px 12px;
+            flex: 1;
+        }
+
+        .cup-ref-main {
+            font-size: 13px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .cup-ref-sub {
+            font-size: 10px;
+            opacity: 0.8;
+            display: block;
+        }
+
+        .details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 1.2rem;
+        }
+
+        .detail-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .detail-label {
+            font-size: 11px;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .detail-number {
+            font-size: 30px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .detail-unit { font-size: 10px; color: #999; margin-top: 2px; }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 1.2rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .instructions-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .instructions ol {
+            margin-left: 18px;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.9;
+        }
+
+        .hidden { display: none !important; }
+
+        @media (max-width: 400px) {
+            .breakdown-num { font-size: 48px; }
+            .big-label { font-size: 17px; }
+            .container { padding: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <div class="farm-name">&#x1F404; MOOODY COUNTY DAIRY</div>
+        <div class="title" id="title">Colostrum Enrichment Calculator</div>
+    </div>
+
+    <div class="language-toggle">
+        <button class="lang-btn active" id="btnEN" onclick="setLanguage('en')">English</button>
+        <button class="lang-btn" id="btnES" onclick="setLanguage('es')">Español</button>
+    </div>
+
+    <div class="input-group">
+        <label id="label1">Colostrum amount (quarts)</label>
+        <input type="number" id="quarts" min="1" max="100" value="40" step="1">
+        <div class="hint" id="hint1">40 quarts = full pasteurizer</div>
+    </div>
+
+    <div class="input-group">
+        <label id="label2">Current Brix quality (%)</label>
+        <input type="number" id="currentBrix" min="10" max="35" value="22" step="0.1">
+        <div class="hint" id="hint2">Test with refractometer</div>
+    </div>
+
+    <div class="input-group">
+        <label id="label3">Target Brix quality (%)</label>
+        <input type="number" id="targetBrix" min="20" max="35" value="24" step="0.1">
+        <div class="hint" id="hint3">Goal is typically 24%</div>
+    </div>
+
+    <div class="results-section">
+        <div class="main-result">
+            <div class="result-label" id="resultLabel">YOU NEED:</div>
+
+            <div class="breakdown-row" id="fullCupsRow">
+                <div class="breakdown-num" id="fullCupsNum">4</div>
+                <div>
+                    <span class="big-label" id="fullCupsLabel">FULL CUPS</span>
+                    <span class="small-label">= 8.6 oz each</span>
+                </div>
+            </div>
+
+            <div class="breakdown-plus hidden" id="plusSign">+</div>
+
+            <div class="breakdown-row hidden" id="halfCupRow">
+                <div class="breakdown-num">1</div>
+                <div>
+                    <span class="big-label" id="halfCupRowLabel">HALF CUP</span>
+                    <span class="small-label">= 4.0 oz</span>
+                </div>
+            </div>
+
+            <div class="subtext" id="subtext"></div>
+
+            <div class="cup-guide">
+                <div class="cup-guide-title" id="cupGuideTitle">YOUR CUP MEASURES</div>
+                <div class="cup-ref-row">
+                    <div class="cup-ref-item">
+                        <svg width="28" height="34" viewBox="0 0 36 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 4 L32 4 L28 40 L8 40 Z" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="2"/>
+                            <path d="M32 10 Q40 10 40 22 Q40 34 32 34" stroke="white" stroke-width="2" fill="none"/>
+                            <path d="M5 8 L31 8 L29 38 L7 38 Z" fill="rgba(255,255,255,0.5)"/>
+                            <text x="18" y="26" text-anchor="middle" fill="#764ba2" font-size="8" font-weight="bold">FULL</text>
+                        </svg>
+                        <div>
+                            <span class="cup-ref-main">8.6 oz</span>
+                            <span class="cup-ref-sub" id="fullCupSubLabel">1 full cup</span>
+                        </div>
+                    </div>
+                    <div class="cup-ref-item">
+                        <svg width="28" height="34" viewBox="0 0 36 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 4 L32 4 L28 40 L8 40 Z" fill="rgba(255,255,255,0.1)" stroke="white" stroke-width="2"/>
+                            <path d="M32 10 Q40 10 40 22 Q40 34 32 34" stroke="white" stroke-width="2" fill="none"/>
+                            <path d="M6.5 22 L29.5 22 L28 40 L8 40 Z" fill="rgba(255,255,255,0.5)"/>
+                            <line x1="5" y1="22" x2="31" y2="22" stroke="white" stroke-width="2" stroke-dasharray="3,2"/>
+                            <text x="18" y="36" text-anchor="middle" fill="#764ba2" font-size="8" font-weight="bold">HALF</text>
+                        </svg>
+                        <div>
+                            <span class="cup-ref-main">4.0 oz</span>
+                            <span class="cup-ref-sub" id="halfCupSubLabel">&#189; cup</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="details">
+            <div class="detail-card">
+                <div class="detail-label" id="ozLabel">Total ounces</div>
+                <div class="detail-number" id="ouncesResult">&#8212;</div>
+                <div class="detail-unit">oz</div>
+            </div>
+            <div class="detail-card">
+                <div class="detail-label" id="exactLabel">Exact cups</div>
+                <div class="detail-number" id="exactCups">&#8212;</div>
+                <div class="detail-unit">cups</div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <div class="instructions-title" id="instructionsTitle">STEPS:</div>
+            <ol id="stepsList"></ol>
+        </div>
+    </div>
+
+</div>
+<script>
+    var T = {
+        en: {
+            title: 'Colostrum Enrichment Calculator',
+            label1: 'Colostrum amount (quarts)',
+            hint1: '40 quarts = full pasteurizer, 20 quarts = half full',
+            label2: 'Current Brix quality (%)',
+            hint2: 'Test with refractometer',
+            label3: 'Target Brix quality (%)',
+            hint3: 'Goal is typically 24%',
+            resultLabel: 'YOU NEED:',
+            fullCupsLabel: 'FULL CUPS',
+            fullCupSingle: 'FULL CUP',
+            halfCupRowLabel: 'HALF CUP',
+            cupGuideTitle: 'YOUR CUP MEASURES',
+            fullCupSubLabel: '1 full cup',
+            halfCupSubLabel: '\u00BD cup',
+            ozLabel: 'Total ounces',
+            exactLabel: 'Exact cups',
+            instructionsTitle: 'STEPS:',
+            noEnrichment: '(no enrichment needed)',
+            exactSuffix: 'cups exact',
+            steps: ['Put powder in a dry pail', 'Carry to pasteurizer and mix with whisk']
+        },
+        es: {
+            title: 'Calculador de Calostro',
+            label1: 'Cantidad de calostro (cuartos)',
+            hint1: '40 cuartos = pasteurizador lleno, 20 = medio lleno',
+            label2: 'Brix del calostro actual (%)',
+            hint2: 'Prueba con refract\u00f3metro',
+            label3: 'Meta de Brix (%)',
+            hint3: 'Meta t\u00edpica es 24%',
+            resultLabel: 'USTED NECESITA:',
+            fullCupsLabel: 'TAZAS LLENAS',
+            fullCupSingle: 'TAZA LLENA',
+            halfCupRowLabel: 'MEDIA TAZA',
+            cupGuideTitle: 'SUS MEDIDAS DE TAZA',
+            fullCupSubLabel: '1 taza completa',
+            halfCupSubLabel: '\u00BD taza',
+            ozLabel: 'Total onzas',
+            exactLabel: 'Tazas exactas',
+            instructionsTitle: 'PASOS:',
+            noEnrichment: '(no se necesita enriquecimiento)',
+            exactSuffix: 'tazas exactas',
+            steps: ['Ponga polvo en balde seco', 'Lleve al pasteurizador y mezcle con batidor']
+        }
+    };
+
+    var lang = 'en';
+
+    function setLanguage(l) {
+        lang = l;
+        document.getElementById('btnEN').className = 'lang-btn' + (l === 'en' ? ' active' : '');
+        document.getElementById('btnES').className = 'lang-btn' + (l === 'es' ? ' active' : '');
+        applyTranslations();
+        calculate();
+    }
+
+    function applyTranslations() {
+        var t = T[lang];
+        document.getElementById('title').textContent            = t.title;
+        document.getElementById('label1').textContent           = t.label1;
+        document.getElementById('hint1').textContent            = t.hint1;
+        document.getElementById('label2').textContent           = t.label2;
+        document.getElementById('hint2').textContent            = t.hint2;
+        document.getElementById('label3').textContent           = t.label3;
+        document.getElementById('hint3').textContent            = t.hint3;
+        document.getElementById('resultLabel').textContent      = t.resultLabel;
+        document.getElementById('halfCupRowLabel').textContent  = t.halfCupRowLabel;
+        document.getElementById('cupGuideTitle').textContent    = t.cupGuideTitle;
+        document.getElementById('fullCupSubLabel').textContent  = t.fullCupSubLabel;
+        document.getElementById('halfCupSubLabel').textContent  = t.halfCupSubLabel;
+        document.getElementById('ozLabel').textContent          = t.ozLabel;
+        document.getElementById('exactLabel').textContent       = t.exactLabel;
+        document.getElementById('instructionsTitle').textContent = t.instructionsTitle;
+        var list = document.getElementById('stepsList');
+        list.innerHTML = '';
+        for (var i = 0; i < t.steps.length; i++) {
+            var li = document.createElement('li');
+            li.textContent = t.steps[i];
+            list.appendChild(li);
+        }
+    }
+
+    function calculate() {
+        var quarts      = parseFloat(document.getElementById('quarts').value)      || 0;
+        var currentBrix = parseFloat(document.getElementById('currentBrix').value) || 0;
+        var targetBrix  = parseFloat(document.getElementById('targetBrix').value)  || 24;
+        var t = T[lang];
+        var diff = targetBrix - currentBrix;
+
+        if (diff <= 0) {
+            document.getElementById('fullCupsNum').textContent   = '0';
+            document.getElementById('fullCupsLabel').textContent = t.fullCupsLabel;
+            document.getElementById('halfCupRow').className      = 'breakdown-row hidden';
+            document.getElementById('plusSign').className        = 'breakdown-plus hidden';
+            document.getElementById('ouncesResult').textContent  = '0';
+            document.getElementById('exactCups').textContent     = '0';
+            document.getElementById('subtext').textContent       = t.noEnrichment;
+            return;
+        }
+
+        var powderOz  = Math.round(diff * quarts * 0.5 * 10) / 10;
+        var exactCups = Math.round(powderOz / 8.6 * 100) / 100;
+        var rounded   = Math.round(exactCups * 2) / 2;
+        var fullCups  = Math.floor(rounded);
+        var hasHalf   = (rounded - fullCups) >= 0.5;
+
+        document.getElementById('fullCupsNum').textContent   = fullCups;
+        document.getElementById('fullCupsLabel').textContent = (fullCups === 1) ? t.fullCupSingle : t.fullCupsLabel;
+
+        if (hasHalf) {
+            document.getElementById('halfCupRow').className = 'breakdown-row';
+            document.getElementById('plusSign').className   = 'breakdown-plus';
+        } else {
+            document.getElementById('halfCupRow').className = 'breakdown-row hidden';
+            document.getElementById('plusSign').className   = 'breakdown-plus hidden';
+        }
+
+        document.getElementById('ouncesResult').textContent = powderOz;
+        document.getElementById('exactCups').textContent    = exactCups;
+        document.getElementById('subtext').textContent      = '(' + exactCups + ' ' + t.exactSuffix + ')';
+    }
+
+    document.getElementById('quarts').addEventListener('input', calculate);
+    document.getElementById('currentBrix').addEventListener('input', calculate);
+    document.getElementById('targetBrix').addEventListener('input', calculate);
+
+    applyTranslations();
+    calculate();
+</script>
+</body>
+</html>
